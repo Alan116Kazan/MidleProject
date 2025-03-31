@@ -4,12 +4,12 @@ using Unity.Entities;
 
 public class UserInputData : MonoBehaviour, IConvertGameObjectToEntity
 {
-    public float _speed;
+    public float speed;
 
     public MonoBehaviour ShootAction;
 
-    public float dashDelay = 1f;      // Задержка между рывками (в секундах)
-    public float dashDistance = 1f;   // Расстояние рывка (например, 1 метр)
+    public float dashDelay = 1f;
+    public float dashDistance = 1f;
 
     public float shootingForce = 5f;
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
@@ -20,7 +20,7 @@ public class UserInputData : MonoBehaviour, IConvertGameObjectToEntity
         // Добавление компонента для хранения данных движения.
         dstManager.AddComponentData(entity, new MoveData
         {
-            Speed = _speed / 100            // Делим скорость для масштабирования (настройка по требованию)
+            Speed = speed / 100            // Делим скорость для масштабирования
         });
 
         // Если указан ShootAction и он реализует IAbility,
@@ -46,18 +46,17 @@ public class UserInputData : MonoBehaviour, IConvertGameObjectToEntity
 // Компонент для хранения данных ввода.
 public struct InputData : IComponentData
 {
-    public float2 Move;     // Вектор направления движения (x и y компоненты)
-    public float Shoot;     // Значение для стрельбы (например, 1 при нажатии кнопки)
-    public float Dash; // Если значение > 0, значит нажата кнопка рывка (CTRL)
+    public float2 Move;
+    public float Shoot;
+    public float Dash;
 }
 
 // Компонент для хранения данных движения.
 public struct MoveData : IComponentData
 {
-    public float Speed;     // Скорость перемещения объекта
+    public float Speed;
 }
 
-// Пустой маркер-компонент для обозначения возможности стрельбы.
 public struct ShootData : IComponentData
 {
     public float ShootingForce;  // Сила, с которой пуля будет выброшена (импульс)
@@ -65,7 +64,7 @@ public struct ShootData : IComponentData
 
 public struct DashData : IComponentData
 {
-    public float DashDelay;      // Задержка между рывками (в секундах)
-    public float DashDistance;   // Расстояние, на которое производится рывок
-    public float LastDashTime;   // Время последнего выполненного рывка
+    public float DashDelay;
+    public float DashDistance;
+    public float LastDashTime;
 }

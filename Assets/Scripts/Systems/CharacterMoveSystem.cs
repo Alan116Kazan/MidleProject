@@ -2,7 +2,7 @@ using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class CharecterMoveSystem : ComponentSystem
+public class CharacterMoveSystem : ComponentSystem
 {
     private EntityQuery _moveQuery;
 

@@ -9,15 +9,14 @@ public class UserInputSystem : ComponentSystem
     private EntityQuery _inputQuery;
     private InputAction _moveAction;
     private InputAction _shootAction;
-    private InputAction _dashAction; // Новый InputAction для рывка
+    private InputAction _dashAction;
 
-    private float2 _moveInput;   // Сохраняет вектор движения, полученный от пользователя
-    private float _shootInput;   // Сохраняет значение для стрельбы (например, 1 или 0)
-    private float _dashInput; // Локальная переменная для рывка
+    private float2 _moveInput;
+    private float _shootInput;
+    private float _dashInput;
 
     protected override void OnCreate()
     {
-        // Запрос для всех сущностей, имеющих компонент InputData.
         _inputQuery = GetEntityQuery(ComponentType.ReadOnly<InputData>());
     }
 

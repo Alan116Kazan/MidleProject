@@ -4,29 +4,29 @@ using UnityEngine;
 
 public class ShootAbility : MonoBehaviour, IAbility
 {
-    public GameObject _bullet;      // Префаб пули
-    public float shotDelay;         // Задержка между выстрелами
+    public GameObject Bullet;      // Префаб пули
+    public float ShotDelay;         // Задержка между выстрелами
 
-    public float shootingForce = 5f;
+    public float ShootingForce = 5f;
 
     private float _shootTime = float.MinValue;  // Время последнего выстрела
 
-    public void Exicute()
+    public void Execute()
     {
         // Проверяем, прошло ли достаточно времени с прошлого выстрела.
-        if (Time.time < _shootTime + shotDelay) return;
+        if (Time.time < _shootTime + ShotDelay) return;
 
         _shootTime = Time.time;  // Обновляем время последнего выстрела
 
-        if (_bullet != null)
+        if (Bullet != null)
         {
-            GameObject newBullet = Instantiate(_bullet, transform.position, transform.rotation);
+            GameObject newBullet = Instantiate(Bullet, transform.position, transform.rotation);
 
             // Добавляем силу выстрела.
             Rigidbody rb = newBullet.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.AddForce(transform.forward * shootingForce, ForceMode.Impulse);
+                rb.AddForce(transform.forward * ShootingForce, ForceMode.Impulse);
             }
         }
         else
