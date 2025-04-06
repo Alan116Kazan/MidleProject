@@ -1461,6 +1461,8 @@ MonoBehaviour:
   Bullet: {fileID: 4064436871665081291, guid: 80d5c683a413b094186536372f27d2e3, type: 3}
   ShotDelay: 1
   ShootingForce: 3
+  stats:
+    shotsCount: 0
 --- !u!136 &1676676521
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1487,7 +1489,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bd9baf7114c4d645acd217f4f7ed287, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Health: 100
+  settings: {fileID: 11400000, guid: 094a915c0e4a44242bd27d5e6b93cd26, type: 2}
+  ShootAbility: {fileID: 1676676518}
 --- !u!1 &1755378575
 GameObject:
   m_ObjectHideFlags: 0
