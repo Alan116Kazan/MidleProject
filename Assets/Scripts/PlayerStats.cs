@@ -3,5 +3,5 @@
 [Serializable]
 public class PlayerStats
 {
-    public int shotsCount;
+    public int Health;
 }

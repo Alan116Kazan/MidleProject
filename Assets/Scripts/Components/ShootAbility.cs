@@ -9,25 +9,25 @@ public class ShootAbility : MonoBehaviour, IAbility
     public float ShootingForce = 5f;
     private float _shootTime = float.MinValue;
 
-    public PlayerStats stats;
+    //public PlayerStats stats;
 
-    private void Start()
-    {
-        // Получаем строку, сохранённую в PlayerPrefs под ключом "Stats".
-        var jsonString = PlayerPrefs.GetString("Stats");
+    //private void Start()
+    //{
+    //    // Получаем строку, сохранённую в PlayerPrefs под ключом "Stats".
+    //    var jsonString = PlayerPrefs.GetString("Stats");
 
-        // Если строка не пуста, значит ранее были сохранены данные игрока.
-        if (!jsonString.Equals(string.Empty, System.StringComparison.Ordinal))
-        {
-            // Преобразуем JSON-строку в объект PlayerStats.
-            stats = JsonUtility.FromJson<PlayerStats>(jsonString);
-        }
-        else
-        {
-            // Если сохранённой строки нет, создаём новый объект статистики.
-            stats = new PlayerStats();
-        }
-    }
+    //    // Если строка не пуста, значит ранее были сохранены данные игрока.
+    //    if (!jsonString.Equals(string.Empty, System.StringComparison.Ordinal))
+    //    {
+    //        // Преобразуем JSON-строку в объект PlayerStats.
+    //        stats = JsonUtility.FromJson<PlayerStats>(jsonString);
+    //    }
+    //    else
+    //    {
+    //        // Если сохранённой строки нет, создаём новый объект статистики.
+    //        stats = new PlayerStats();
+    //    }
+    //}
 
     public void Execute()
     {
@@ -46,7 +46,7 @@ public class ShootAbility : MonoBehaviour, IAbility
             }
 
             // Увеличиваем счетчик выстрелов.
-            stats.shotsCount++;
+            //stats.shotsCount++;
         }
         else
         {
