@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +7,10 @@ public class CharacterHealth : MonoBehaviour
     public Text healthText;
 
     private int _health;
+    private bool isInitializing = true;
+
+    private GameDataManager _gameDataManager;
+
     public int Health
     {
         get => _health;
@@ -20,41 +22,40 @@ public class CharacterHealth : MonoBehaviour
             if (_health <= 0)
                 Destroy(gameObject);
 
-            SaveToLocalAndUpload();
+            if (!isInitializing)
+            {
+                _gameDataManager.SavePlayerStats(new PlayerStats { Health = _health });
+            }
         }
+    }
+
+    private void Awake()
+    {
+        _gameDataManager = new GameDataManager(LocalFileSaver.SaveFileName);
     }
 
     private void Start()
     {
-        Health = settings.HeroHealth;
+        _gameDataManager.LoadPlayerStats(
+            stats =>
+            {
+                Debug.Log($"Загружено здоровье: {stats.Health}");
+                Health = stats.Health;
+                isInitializing = false;
+            },
+            onError: () =>
+            {
+                Debug.Log("Используем значение из настроек.");
+                Health = settings.HeroHealth;
+                isInitializing = false;
+            });
     }
 
     private void UpdateHealthUI()
     {
         if (healthText != null)
-        {
             healthText.text = _health.ToString();
-        }
         else
-        {
             Debug.LogWarning("Health UI не назначен!");
-        }
-    }
-
-    private void SaveToLocalAndUpload()
-    {
-        try
-        {
-            var playerStats = new PlayerStats { Health = _health };
-            string json = JsonUtility.ToJson(playerStats, true);
-
-            LocalFileSaver.SaveToLocal(json);
-            Debug.Log($"Данные сохранены для персонажа с уровнем здоровья {_health}");
-            GoogleDriveTools.UploadFileToGoogleDrive();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError("Ошибка при сохранении или загрузке файла: " + ex.Message);
-        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -5,14 +6,28 @@ public static class LocalFileSaver
 {
     public const string SaveFileName = "GameData.json";
 
-    // Метод для сохранения данных на локальном компьютере
-    public static void SaveToLocal(string obj)
+    public static void SaveToLocalAndUpload(PlayerStats playerStats)
     {
-        string filePath = Path.Combine(Application.persistentDataPath, SaveFileName);
+        if (playerStats == null)
+        {
+            Debug.LogError("PlayerStats is null. Сохранение невозможно.");
+            return;
+        }
 
-        // Сохраняем файл на локальный диск
-        File.WriteAllText(filePath, obj);
+        try
+        {
+            var json = JsonUtility.ToJson(playerStats, prettyPrint: true);
+            string path = Path.Combine(Application.persistentDataPath, SaveFileName);
+            File.WriteAllText(path, json);
 
-        Debug.Log("Файл сохранен на локальном компьютере: " + filePath);
+            Debug.Log($"Данные сохранены локально: {path}");
+            Debug.Log($"Состояние игрока: здоровье = {playerStats.Health}, XP = {playerStats.XP}");
+
+            GoogleDriveUploader.UploadFile(path);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Ошибка при сохранении и загрузке: {ex}");
+        }
     }
 }

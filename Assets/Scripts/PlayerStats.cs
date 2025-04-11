@@ -4,4 +4,6 @@
 public class PlayerStats
 {
     public int Health;
+    public int XP;
+
 }
