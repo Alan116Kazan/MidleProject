@@ -5,6 +5,7 @@ using UnityEngine;
 public class ShootAbility : MonoBehaviour, IAbility
 {
     public GameObject Bullet;
+    public Transform FirePoint; // Точка выстрела
     public float ShotDelay;
     public float ShootingForce = 5f;
     private float _shootTime = float.MinValue;
@@ -31,22 +32,19 @@ public class ShootAbility : MonoBehaviour, IAbility
 
     public void Execute()
     {
-        // Проверяем, прошло ли достаточно времени с момента последнего выстрела.
         if (Time.time < _shootTime + ShotDelay) return;
 
         _shootTime = Time.time;
 
         if (Bullet != null)
         {
-            GameObject newBullet = Instantiate(Bullet, transform.position, transform.rotation);
+            Transform spawnPoint = FirePoint != null ? FirePoint : transform;
+            GameObject newBullet = Instantiate(Bullet, spawnPoint.position, spawnPoint.rotation);
             Rigidbody rb = newBullet.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.AddForce(transform.forward * ShootingForce, ForceMode.Impulse);
+                rb.AddForce(spawnPoint.forward * ShootingForce, ForceMode.Impulse);
             }
-
-            // Увеличиваем счетчик выстрелов.
-            //stats.shotsCount++;
         }
         else
         {
