@@ -1,10 +1,12 @@
 using UnityEngine;
 using Unity.Mathematics;
 using Unity.Entities;
+using Zenject;
+using Assets.Scripts.Components.Interfaces;
 
 public class UserInputData : MonoBehaviour, IConvertGameObjectToEntity
 {
-    public float speed;
+    [Inject] private IGameSettingsProvider _settingsProvider;
 
     public MonoBehaviour ShootAction;
 
@@ -12,19 +14,19 @@ public class UserInputData : MonoBehaviour, IConvertGameObjectToEntity
     public float dashDistance = 1f;
 
     public float shootingForce = 5f;
+
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
-        // Добавление компонента для хранения данных ввода.
+        // В момент конвертации берём скорость из конфигурации
+        float speed = _settingsProvider.Speed / 100f;
+
         dstManager.AddComponentData(entity, new InputData());
 
-        // Добавление компонента для хранения данных движения.
         dstManager.AddComponentData(entity, new MoveData
         {
-            Speed = speed / 100            // Делим скорость для масштабирования
+            Speed = speed
         });
 
-        // Если указан ShootAction и он реализует IAbility,
-        // добавляем маркер-компонент для стрельбы.
         if (ShootAction != null && ShootAction is IAbility)
         {
             dstManager.AddComponentData(entity, new ShootData
@@ -33,7 +35,6 @@ public class UserInputData : MonoBehaviour, IConvertGameObjectToEntity
             });
         }
 
-        // Добавляем компонент с параметрами рывка.
         dstManager.AddComponentData(entity, new DashData
         {
             DashDelay = dashDelay,

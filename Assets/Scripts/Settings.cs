@@ -6,4 +6,5 @@ using UnityEngine;
 public class Settings : ScriptableObject
 {
     public int HeroHealth = 100;
+    public int Speed;
 }
