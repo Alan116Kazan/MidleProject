@@ -6,7 +6,7 @@ public class BulletCollision : MonoBehaviour, IAbilityTarget
     public List<GameObject> Targets { get; set; }
 
     [Header("Effects")]
-    public string CollisionEffectTag = "ImpactEffect";
+    [SerializeField] private string _collisionEffectTag = "ImpactEffect";
 
     private Vector3 _lastHitPoint;
     private Vector3 _lastHitNormal;
@@ -17,18 +17,17 @@ public class BulletCollision : MonoBehaviour, IAbilityTarget
         if (BounceAbilityManager.IsBounceActive && Time.time < BounceAbilityManager.BounceEndTime)
             return;
 
-        if (_hasCollision && !string.IsNullOrEmpty(CollisionEffectTag))
+        if (_hasCollision && !string.IsNullOrEmpty(_collisionEffectTag))
         {
             ObjectPool.Instance.SpawnFromPool(
-                CollisionEffectTag,
+                _collisionEffectTag,
                 _lastHitPoint,
                 Quaternion.LookRotation(_lastHitNormal)
             );
         }
 
-        _hasCollision = false; // —брос
-
-        gameObject.SetActive(false); // ¬место Destroy
+        _hasCollision = false;
+        gameObject.SetActive(false);
     }
 
     private void OnCollisionEnter(Collision collision)

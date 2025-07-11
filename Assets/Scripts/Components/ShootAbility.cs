@@ -3,33 +3,49 @@ using UnityEngine;
 public class ShootAbility : MonoBehaviour, IAbility
 {
     [Header("Shooting")]
-    public string BulletPoolTag = "Bullet";
-    public Transform FirePoint;
-    public float ShotDelay = 0.2f;
-    public float ShootingForce = 5f;
-    private float _shootTime = float.MinValue;
+    [SerializeField] private string _bulletPoolTag = "Bullet";
+    [SerializeField] private Transform _firePoint;
+    [SerializeField] private float _shotDelay = 0.2f;
+    [SerializeField] private float _shootingForce = 5f;
 
     [Header("Effects")]
-    public string ShootEffectPoolTag = "ShootEffect";
+    [SerializeField] private string _shootEffectPoolTag = "ShootEffect";
+
+    private float _nextShotTime;
 
     public void Execute()
     {
-        if (Time.time < _shootTime + ShotDelay) return;
+        if (Time.time < _nextShotTime) return;
 
-        _shootTime = Time.time;
+        _nextShotTime = Time.time + _shotDelay;
 
-        Transform spawnPoint = FirePoint != null ? FirePoint : transform;
+        var spawnPoint = _firePoint ? _firePoint : transform;
 
-        // Воспроизведение эффекта выстрела из пула
-        GameObject effect = ObjectPool.Instance.SpawnFromPool(ShootEffectPoolTag, spawnPoint.position, spawnPoint.rotation);
+        SpawnEffect(spawnPoint);
+        SpawnBullet(spawnPoint);
+    }
 
-        // Получение пули из пула
-        GameObject bullet = ObjectPool.Instance.SpawnFromPool(BulletPoolTag, spawnPoint.position, spawnPoint.rotation);
-        Rigidbody rb = bullet.GetComponent<Rigidbody>();
-        if (rb != null)
+    private void SpawnEffect(Transform spawnPoint)
+    {
+        ObjectPool.Instance.SpawnFromPool(
+            _shootEffectPoolTag,
+            spawnPoint.position,
+            spawnPoint.rotation
+        );
+    }
+
+    private void SpawnBullet(Transform spawnPoint)
+    {
+        var bullet = ObjectPool.Instance.SpawnFromPool(
+            _bulletPoolTag,
+            spawnPoint.position,
+            spawnPoint.rotation
+        );
+
+        if (bullet.TryGetComponent<Rigidbody>(out var rb))
         {
-            rb.velocity = Vector3.zero; // сброс скорости
-            rb.AddForce(spawnPoint.forward * ShootingForce, ForceMode.Impulse);
+            rb.velocity = Vector3.zero;
+            rb.AddForce(spawnPoint.forward * _shootingForce, ForceMode.Impulse);
         }
     }
 }
