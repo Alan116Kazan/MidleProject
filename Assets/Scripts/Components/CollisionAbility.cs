@@ -17,7 +17,7 @@ public class CollisionAbility : MonoBehaviour, IConvertGameObjectToEntity, IAbil
         // Перебираем все действия и проверяем, реализуют ли они интерфейс IAbilityTarget
         foreach (var action in collisionsActions)
         {
-            if (action is IAbilityTarget ability)
+            if (action is IAbilityTarget ability) /*IAbilityTarget*/
             {
                 collisionsActionsAbilities.Add(ability); // Добавляем только те, которые реализуют IAbilityTarget
             }

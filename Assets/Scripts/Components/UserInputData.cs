@@ -10,21 +10,30 @@ public class UserInputData : MonoBehaviour, IConvertGameObjectToEntity
 
     public MonoBehaviour ShootAction;
 
+    // Приватное поле
+    private float _speed;
+
+    // Публичное свойство только для чтения извне
+    public float CharacterSpeed => _speed;
+
     public float dashDelay = 1f;
     public float dashDistance = 1f;
+
+    public string moveAnimHash;
+    public string moveAnimSpeedHash;
 
     public float shootingForce = 5f;
 
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
-        // В момент конвертации берём скорость из конфигурации
-        float speed = _settingsProvider.Speed / 100f;
+        // Задаём скорость из конфигурации
+        _speed = _settingsProvider.Speed;
 
         dstManager.AddComponentData(entity, new InputData());
 
         dstManager.AddComponentData(entity, new MoveData
         {
-            Speed = speed
+            Speed = _speed / 100f
         });
 
         if (ShootAction != null && ShootAction is IAbility)
@@ -41,8 +50,14 @@ public class UserInputData : MonoBehaviour, IConvertGameObjectToEntity
             DashDistance = dashDistance,
             LastDashTime = float.MinValue
         });
+
+        if (!string.IsNullOrEmpty(moveAnimHash))
+        {
+            dstManager.AddComponentData(entity, new AnimData());
+        }
     }
 }
+
 
 // Компонент для хранения данных ввода.
 public struct InputData : IComponentData
@@ -68,4 +83,9 @@ public struct DashData : IComponentData
     public float DashDelay;
     public float DashDistance;
     public float LastDashTime;
+}
+
+public struct AnimData : IComponentData
+{
+
 }
