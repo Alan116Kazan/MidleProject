@@ -8,16 +8,30 @@ public class CollisionAbility : MonoBehaviour, IConvertGameObjectToEntity, IAbil
     public Collider Collider; // Коллайдер, который будет использоваться для определения столкновений
 
     public List<MonoBehaviour> collisionsActions = new List<MonoBehaviour>(); // Список действий, выполняемых при столкновении
-    public List<IAbilityTarget> collisionsActionsAbilities = new List<IAbilityTarget>(); // Те же действия, но приведенные к интерфейсу IAbilityTarget
+    public List<IAbility> collisionsActionsAbilities = new List<IAbility>(); // Те же действия, но приведенные к интерфейсу IAbilityTarget
 
     [HideInInspector] public List<Collider> collisions; // Список коллайдеров, с которыми произошло столкновение
 
     private void Start()
+    //{
+    //    // Перебираем все действия и проверяем, реализуют ли они интерфейс IAbilityTarget
+    //    foreach (var action in collisionsActions)
+    //    {
+    //        if (action is IAbilityTarget ability) /*IAbilityTarget*/
+    //        {
+    //            collisionsActionsAbilities.Add(ability); // Добавляем только те, которые реализуют IAbilityTarget
+    //        }
+    //        else
+    //        {
+    //            Debug.LogError("Collision action must derive from IAbility"); // Ошибка, если действие не реализует интерфейс
+    //        }
+    //    }
+
     {
-        // Перебираем все действия и проверяем, реализуют ли они интерфейс IAbilityTarget
+        // Перебираем все действия и проверяем, реализуют ли они интерфейс IAbility
         foreach (var action in collisionsActions)
         {
-            if (action is IAbilityTarget ability) /*IAbilityTarget*/
+            if (action is IAbility ability) 
             {
                 collisionsActionsAbilities.Add(ability); // Добавляем только те, которые реализуют IAbilityTarget
             }
@@ -26,6 +40,7 @@ public class CollisionAbility : MonoBehaviour, IConvertGameObjectToEntity, IAbil
                 Debug.LogError("Collision action must derive from IAbility"); // Ошибка, если действие не реализует интерфейс
             }
         }
+
     }
 
     // Метод Convert вызывается при конвертации объекта в Entity (при использовании SubScene)
@@ -76,14 +91,29 @@ public class CollisionAbility : MonoBehaviour, IConvertGameObjectToEntity, IAbil
     // Метод Execute выполняет все действия, связанные со столкновениями
     public void Execute()
     {
+        //foreach (var action in collisionsActionsAbilities)
+        //{
+        //    action.Targets = new List<GameObject>(); // Очищаем список целей перед обновлением
+        //    collisions.ForEach(c =>
+        //    {
+        //        if (c != null) action.Targets.Add(c.gameObject); // Добавляем объекты столкновения в список целей
+        //    });
+        //    action.Execute(); // Запускаем действие
+        //}
+
         foreach (var action in collisionsActionsAbilities)
         {
-            action.Targets = new List<GameObject>(); // Очищаем список целей перед обновлением
-            collisions.ForEach(c =>
+            if (action is IAbilityTarget actionTarget)
             {
-                if (c != null) action.Targets.Add(c.gameObject); // Добавляем объекты столкновения в список целей
-            });
+                actionTarget.Targets = new List<GameObject>(); // Очищаем список целей перед обновлением
+                collisions.ForEach(c =>
+                {
+                    if (c != null) actionTarget.Targets.Add(c.gameObject); // Добавляем объекты столкновения в список целей
+                });
+                
+            }
             action.Execute(); // Запускаем действие
+
         }
     }
 
