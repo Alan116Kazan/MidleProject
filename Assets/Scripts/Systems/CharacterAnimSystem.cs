@@ -2,7 +2,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class CharacterAnimSystem : ComponentSystem
 {
@@ -10,20 +9,32 @@ public class CharacterAnimSystem : ComponentSystem
 
     protected override void OnCreate()
     {
-        _animQuery = GetEntityQuery(ComponentType.ReadOnly<AnimData>(), ComponentType.ReadOnly<Animator>());
+        _animQuery = GetEntityQuery(
+            ComponentType.ReadOnly<AnimData>(),
+            ComponentType.ReadOnly<Animator>(),
+            ComponentType.ReadOnly<InputData>(),
+            ComponentType.ReadOnly<UserInputData>()
+        );
     }
 
     protected override void OnUpdate()
     {
-        // Перебираем все сущности из запроса.
         Entities.With(_animQuery).ForEach(
             (Entity entity, ref InputData move, Animator animator, UserInputData inputData) =>
             {
-                animator.SetBool(inputData.moveAnimHash, Math.Abs(move.Move.x) > 0.01f || Math.Abs(move.Move.y) > 0.01f);
+                // Анимация движения
+                animator.SetBool(inputData.moveAnimHash, math.lengthsq(move.Move) > 0.01f);
 
-                if (inputData.moveAnimSpeedHash == String.Empty) return;
+                if (!string.IsNullOrEmpty(inputData.moveAnimSpeedHash))
+                {
+                    animator.SetFloat(inputData.moveAnimSpeedHash, inputData.CharacterSpeed * math.lengthsq(move.Move));
+                }
 
-                animator.SetFloat(inputData.moveAnimSpeedHash, inputData.CharacterSpeed * math.distancesq(move.Move.x,move.Move.y));
+                // Анимация стрельбы
+                if (move.Shoot > 0f && !string.IsNullOrEmpty(inputData.shootAnimTriggerHash))
+                {
+                    animator.SetTrigger(inputData.shootAnimTriggerHash);
+                }
             });
     }
 }

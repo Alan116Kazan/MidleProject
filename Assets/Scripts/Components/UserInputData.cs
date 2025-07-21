@@ -10,10 +10,7 @@ public class UserInputData : MonoBehaviour, IConvertGameObjectToEntity
 
     public MonoBehaviour ShootAction;
 
-    // Приватное поле
-    private float _speed;
 
-    // Публичное свойство только для чтения извне
     public float CharacterSpeed => _speed;
 
     public float dashDelay = 1f;
@@ -21,8 +18,11 @@ public class UserInputData : MonoBehaviour, IConvertGameObjectToEntity
 
     public string moveAnimHash;
     public string moveAnimSpeedHash;
+    public string shootAnimTriggerHash;
 
     public float shootingForce = 5f;
+
+    private float _speed;
 
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
