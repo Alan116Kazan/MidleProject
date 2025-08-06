@@ -1,5 +1,7 @@
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
+
 public class GameDataManager
 {
     private readonly string _fileName;
@@ -9,40 +11,32 @@ public class GameDataManager
         _fileName = fileName;
     }
 
-    public void LoadPlayerStats(Action<PlayerStats> onLoaded, Action onError = null)
+    public async Task<PlayerStats> LoadPlayerStatsAsync()
     {
-        GoogleDriveFinder.FindFileIdByName(_fileName, fileId =>
+        string fileId = await GoogleDriveFinder.FindFileIdByNameAsync(_fileName);
+        if (string.IsNullOrEmpty(fileId))
         {
-            if (!string.IsNullOrEmpty(fileId))
-            {
-                Debug.Log("Файл найден на Google Drive. Загружаем...");
-                GoogleDriveDownloader.DownloadFile(fileId, jsonContent =>
-                {
-                    try
-                    {
-                        var stats = JsonUtility.FromJson<PlayerStats>(jsonContent);
-                        if (stats != null)
-                            onLoaded?.Invoke(stats);
-                        else
-                            onError?.Invoke();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogError("Ошибка при десериализации: " + ex.Message);
-                        onError?.Invoke();
-                    }
-                });
-            }
-            else
-            {
-                Debug.Log("Файл не найден на Google Drive.");
-                onError?.Invoke();
-            }
-        });
+            Debug.Log("Файл не найден на Google Drive.");
+            return null;
+        }
+
+        string json = await GoogleDriveDownloader.DownloadFileAsync(fileId);
+        if (string.IsNullOrEmpty(json)) return null;
+
+        try
+        {
+            var stats = JsonUtility.FromJson<PlayerStats>(json);
+            return stats;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Ошибка при десериализации: " + ex.Message);
+            return null;
+        }
     }
 
-    public void SavePlayerStats(PlayerStats stats)
+    public async Task SavePlayerStatsAsync(PlayerStats stats)
     {
-        LocalFileSaver.SaveToLocalAndUpload(stats);
+        await LocalFileSaver.SaveToLocalAndUpload(stats);
     }
 }

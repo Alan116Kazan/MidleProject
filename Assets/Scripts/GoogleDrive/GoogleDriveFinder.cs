@@ -1,18 +1,21 @@
-using System;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityGoogleDrive;
 
 public static class GoogleDriveFinder
 {
-    public static void FindFileIdByName(string fileName, Action<string> onResult)
+    public static async Task<string> FindFileIdByNameAsync(string fileName)
     {
+        var tcs = new TaskCompletionSource<string>();
         var listRequest = GoogleDriveFiles.List();
         listRequest.Q = $"name = '{fileName}' and trashed = false";
 
         listRequest.Send().OnDone += fileList =>
         {
             string fileId = fileList?.Files?.FirstOrDefault()?.Id;
-            onResult?.Invoke(fileId);
+            tcs.SetResult(fileId);
         };
+
+        return await tcs.Task;
     }
 }

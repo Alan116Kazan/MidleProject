@@ -1,10 +1,11 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public static class GoogleDriveUploader
 {
-    public static void UploadFile(string localFilePath, Action onDone = null)
+    public static async Task UploadFileAsync(string localFilePath, Action onDone = null)
     {
         if (!File.Exists(localFilePath))
         {
@@ -16,18 +17,16 @@ public static class GoogleDriveUploader
         string fileName = Path.GetFileName(localFilePath);
         string mimeType = "application/json";
 
-        GoogleDriveFinder.FindFileIdByName(fileName, fileId =>
+        string fileId = await GoogleDriveFinder.FindFileIdByNameAsync(fileName);
+        if (string.IsNullOrEmpty(fileId))
         {
-            if (string.IsNullOrEmpty(fileId))
-            {
-                Debug.Log("Файл не найден. Создание нового...");
-                GoogleDriveFileEditor.CreateFile(fileName, byteContent, mimeType, onDone);
-            }
-            else
-            {
-                Debug.Log($"Файл найден. ID: {fileId}. Обновление...");
-                GoogleDriveFileEditor.UpdateFile(fileId, fileName, byteContent, mimeType, onDone);
-            }
-        });
+            Debug.Log("Файл не найден. Создание нового...");
+            GoogleDriveFileEditor.CreateFile(fileName, byteContent, mimeType, onDone);
+        }
+        else
+        {
+            Debug.Log($"Файл найден. ID: {fileId}. Обновление...");
+            GoogleDriveFileEditor.UpdateFile(fileId, fileName, byteContent, mimeType, onDone);
+        }
     }
 }

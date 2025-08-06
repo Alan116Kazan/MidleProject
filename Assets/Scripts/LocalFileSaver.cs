@@ -1,12 +1,13 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public static class LocalFileSaver
 {
     public const string SaveFileName = "GameData.json";
 
-    public static void SaveToLocalAndUpload(PlayerStats playerStats)
+    public static async Task SaveToLocalAndUpload(PlayerStats playerStats)
     {
         if (playerStats == null)
         {
@@ -23,11 +24,12 @@ public static class LocalFileSaver
             Debug.Log($"Данные сохранены локально: {path}");
             Debug.Log($"Состояние игрока: здоровье = {playerStats.Health}, XP = {playerStats.XP}");
 
-            GoogleDriveUploader.UploadFile(path);
+            await GoogleDriveUploader.UploadFileAsync(path);
         }
         catch (Exception ex)
         {
             Debug.LogError($"Ошибка при сохранении и загрузке: {ex}");
         }
     }
+
 }

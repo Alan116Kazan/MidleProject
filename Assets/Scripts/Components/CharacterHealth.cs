@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,7 +23,6 @@ public class CharacterHealth : MonoBehaviour
         get => _health;
         set
         {
-            // Игнорируем, если персонаж уже мёртв
             if (isDead) return;
 
             int oldHealth = _health;
@@ -30,21 +30,18 @@ public class CharacterHealth : MonoBehaviour
 
             UpdateHealthUI();
 
-            // Триггерим анимацию урона
             if (!isInitializing && _health < oldHealth)
             {
                 _animator?.SetTrigger(_damageTrigger);
             }
 
-            // Смерть
             if (_health <= 0)
             {
                 isDead = true;
-
                 if (_animator != null && !string.IsNullOrEmpty(_deathTrigger))
                 {
                     _animator.SetTrigger(_deathTrigger);
-                    Destroy(gameObject, 2f); // дать анимации проиграться
+                    Destroy(gameObject, 2f);
                 }
                 else
                 {
@@ -52,13 +49,25 @@ public class CharacterHealth : MonoBehaviour
                 }
             }
 
-            // Сохраняем новое здоровье (если это не инициализация)
             if (!isInitializing)
             {
-                _gameDataManager.SavePlayerStats(new PlayerStats { Health = _health });
+                SaveHealthAsync();
             }
         }
     }
+
+    private async void SaveHealthAsync()
+    {
+        try
+        {
+            await _gameDataManager.SavePlayerStatsAsync(new PlayerStats { Health = _health });
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Ошибка при сохранении: " + ex);
+        }
+    }
+
 
     private void Awake()
     {
@@ -68,22 +77,23 @@ public class CharacterHealth : MonoBehaviour
             _animator = GetComponent<Animator>();
     }
 
-    private void Start()
+    private async void Start()
     {
-        _gameDataManager.LoadPlayerStats(
-            stats =>
-            {
-                Debug.Log($"Загружено здоровье: {stats.Health}");
-                Health = stats.Health;
-                isInitializing = false;
-            },
-            onError: () =>
-            {
-                Debug.Log("Используем значение из настроек.");
-                Health = settings.HeroHealth;
-                isInitializing = false;
-            });
+        var stats = await _gameDataManager.LoadPlayerStatsAsync();
+        if (stats != null)
+        {
+            Debug.Log($"Загружено здоровье: {stats.Health}");
+            Health = stats.Health;
+        }
+        else
+        {
+            Debug.Log("Используем значение из настроек.");
+            Health = settings.HeroHealth;
+        }
+
+        isInitializing = false;
     }
+
 
     private void UpdateHealthUI()
     {
