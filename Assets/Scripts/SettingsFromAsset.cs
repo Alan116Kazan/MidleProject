@@ -9,6 +9,6 @@ public class SettingsFromAsset : IGameSettingsProvider
         _settings = settings;
     }
 
-    //public int HeroHealth => _settings.HeroHealth;
+    public int HeroHealth => _settings.HeroHealth;
     public int Speed => _settings.Speed;
 }

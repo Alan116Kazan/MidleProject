@@ -1,10 +1,13 @@
 using System;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CharacterHealth : MonoBehaviour
 {
-    public Settings settings;
+    // Используем DummySettings вместо SO Settings
+    private DummySettings _settingsProvider = new DummySettings();
+
     public Text healthText;
 
     [Header("Animation")]
@@ -68,7 +71,6 @@ public class CharacterHealth : MonoBehaviour
         }
     }
 
-
     private void Awake()
     {
         _gameDataManager = new GameDataManager(LocalFileSaver.SaveFileName);
@@ -79,21 +81,32 @@ public class CharacterHealth : MonoBehaviour
 
     private async void Start()
     {
-        var stats = await _gameDataManager.LoadPlayerStatsAsync();
-        if (stats != null)
+        try
         {
-            Debug.Log($"Загружено здоровье: {stats.Health}");
-            Health = stats.Health;
-        }
-        else
-        {
-            Debug.Log("Используем значение из настроек.");
-            Health = settings.HeroHealth;
-        }
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var stats = await _gameDataManager.LoadPlayerStatsAsync(cts.Token);
 
-        isInitializing = false;
+            if (stats != null)
+            {
+                Debug.Log($"Загружено здоровье: {stats.Health}");
+                Health = stats.Health;
+            }
+            else
+            {
+                Debug.LogWarning("Не удалось загрузить здоровье. Используется дефолт из DummySettings.");
+                Health = _settingsProvider.HeroHealth;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Ошибка при загрузке здоровья: " + ex);
+            Health = _settingsProvider.HeroHealth;
+        }
+        finally
+        {
+            isInitializing = false;
+        }
     }
-
 
     private void UpdateHealthUI()
     {

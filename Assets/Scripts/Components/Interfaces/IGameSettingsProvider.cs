@@ -8,7 +8,7 @@ namespace Assets.Scripts.Components.Interfaces
 {
     public interface IGameSettingsProvider
     {
-        //int HeroHealth { get; }
+        int HeroHealth { get; }
         int Speed { get; }
     }
 }
