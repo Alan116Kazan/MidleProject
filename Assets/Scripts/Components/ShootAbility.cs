@@ -13,6 +13,13 @@ public class ShootAbility : MonoBehaviour, IAbility
 
     private float _nextShotTime;
 
+    private CharacterData character;
+
+    private void Start()
+    {
+        character = GetComponent<CharacterData>();
+    }
+
     public void Execute()
     {
         if (Time.time < _nextShotTime) return;
@@ -23,6 +30,8 @@ public class ShootAbility : MonoBehaviour, IAbility
 
         SpawnEffect(spawnPoint);
         SpawnBullet(spawnPoint);
+
+        character.Score(10);
     }
 
     private void SpawnEffect(Transform spawnPoint)
