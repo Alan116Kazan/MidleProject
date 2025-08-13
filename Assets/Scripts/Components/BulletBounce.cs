@@ -4,20 +4,25 @@ using UnityEngine;
 
 public class BulletBounce : MonoBehaviour, IAbilityTarget
 {
-    public List<GameObject> Targets { get; set; }
-    public float Duration = 10f; // Способность действует 10 секунд
+    public List<GameObject> Targets { get; set; } = new List<GameObject>();
+    public float Duration = 10f;
+
+    public bool IsActive => BounceAbilityManager.IsBounceActive;
 
     public void Execute()
     {
-        // Активируем способность отскока
+        if (BounceAbilityManager.IsBounceActive)
+        {
+            Debug.Log("Bounce уже активен!");
+            return;
+        }
+
         BounceAbilityManager.IsBounceActive = true;
         BounceAbilityManager.BounceEndTime = Time.time + Duration;
 
         Debug.Log($"Perk активирован на {Duration} секунд");
 
-        // После Duration секунд отключаем способность
-        StartCoroutine(DeactivateBounce());
-
+        CoroutineRunner.Instance.StartCoroutine(DeactivateBounce());
         Destroy(gameObject);
     }
 
@@ -25,5 +30,6 @@ public class BulletBounce : MonoBehaviour, IAbilityTarget
     {
         yield return new WaitForSeconds(Duration);
         BounceAbilityManager.IsBounceActive = false;
+        Debug.Log("Perk деактивирован");
     }
 }

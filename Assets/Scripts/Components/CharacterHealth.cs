@@ -8,12 +8,13 @@ public class CharacterHealth : MonoBehaviour
     // Используем DummySettings вместо SO Settings
     private DummySettings _settingsProvider = new DummySettings();
 
-    public Text healthText;
 
     [Header("Animation")]
     [SerializeField] private Animator _animator;
     [SerializeField] private string _damageTrigger = "TakeDamage";
     [SerializeField] private string _deathTrigger = "Die";
+
+    private ViewModel viewModel;
 
     private int _health;
     private bool isInitializing = true;
@@ -26,12 +27,16 @@ public class CharacterHealth : MonoBehaviour
         get => _health;
         set
         {
+            if (_health == value) return;
+
+            _health = Mathf.Max(0, value);
+
+            if (viewModel != null)
+                viewModel.Health = _health.ToString();
+
             if (isDead) return;
 
             int oldHealth = _health;
-            _health = Mathf.Max(0, value);
-
-            UpdateHealthUI();
 
             if (!isInitializing && _health < oldHealth)
             {
@@ -59,6 +64,7 @@ public class CharacterHealth : MonoBehaviour
         }
     }
 
+
     private async void SaveHealthAsync()
     {
         try
@@ -81,6 +87,8 @@ public class CharacterHealth : MonoBehaviour
 
     private async void Start()
     {
+        viewModel = FindObjectOfType<ViewModel>();
+
         try
         {
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
@@ -106,13 +114,5 @@ public class CharacterHealth : MonoBehaviour
         {
             isInitializing = false;
         }
-    }
-
-    private void UpdateHealthUI()
-    {
-        if (healthText != null)
-            healthText.text = _health.ToString();
-        else
-            Debug.LogWarning("Health UI не назначен!");
     }
 }

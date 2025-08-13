@@ -26,7 +26,6 @@ public class GiveItemPickUpAbility : MonoBehaviour, IAbilityTarget, IConvertGame
         foreach (var target in Targets)
         {
             var character = target.GetComponent<CharacterData>();
-            //if (character != null) character.Score(3);
 
             if (character == null) return;
             var item = Object.Instantiate(UIItem, character.InventoryUiRoot.transform, false);
